@@ -244,6 +244,11 @@ db.borough.insertMany([
   { _id: "Missing", name: "Missing" },
 ]);
 
+// on peut aussi faire ça pour créer la collection borough :
+db.restaurants.distinct("borough").forEach((borough) => {
+  db.borough.insertOne({ _id: borough, name: borough });
+});
+
 const boroughs = db.borough.find().toArray();
 
 for (borough of boroughs) {
