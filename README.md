@@ -1,5 +1,7 @@
 # Exercice 1
 
+## Ce fichier contient toutes nos réponses au TP
+
 - Créer la base de données bookstore et les collections categories et books :
 
 ```js
@@ -222,7 +224,7 @@ db.borough.insertMany([
   { _id: "Bronx", name: "Bronx" },
   { _id: "Queens", name: "Queens" },
   { _id: "Staten Island", name: "Staten Island" },
-  { _id: "Missing", name: "Missing"}
+  { _id: "Missing", name: "Missing" },
 ]);
 
 const boroughs = db.borough.find().toArray();
@@ -237,7 +239,7 @@ for (borough of boroughs) {
 // unset borough
 db.restaurants.updateMany({}, { $unset: { borough: "" } });
 
-db.restaurants.find({ borough_id: { $exists : true} }).count();
+db.restaurants.find({ borough_id: { $exists: true } }).count();
 
 // find all restaurants in brooklyn
 db.restaurants.find({
