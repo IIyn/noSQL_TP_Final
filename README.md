@@ -121,6 +121,13 @@ db.books.updateOne(
 
 ```js
 db.books.find({ category_id: { $exists: false } });
+
+// [
+//   {
+//     _id: ObjectId("640afd9f1b87490ea38cecfc"),
+//     title: 'Modélisation des données'
+//   }
+// ]
 ```
 
 # Exercice 2
@@ -195,9 +202,19 @@ for (let i = categories.length - 1; i >= 0; i--) {
 
 db.categoriestree.find({ _id: "MongoDB" }, { ancestors: 1 });
 
+// [{ _id: "MongoDB", ancestors: ["Database", "Programming", "Books"] }];
+
 db.categoriestree.find({ _id: "Database" }, { ancestors: 1 });
 
+// [ { _id: 'Database', ancestors: [ 'Programming', 'Books' ] } ]
+
 db.categoriestree.find({ _id: "Programming" }, { ancestors: 1 });
+
+// [ { _id: 'Programming', ancestors: [ 'Books' ] } ]
+
+db.categoriestree.find({ _id: "Books" }, { ancestors: 1 });
+
+// [ { _id: 'Books' } ]
 ```
 
 # Exercice 3 Recherche & Développement - Collection Restaurants
@@ -240,11 +257,22 @@ for (borough of boroughs) {
 db.restaurants.updateMany({}, { $unset: { borough: "" } });
 
 db.restaurants.find({ borough_id: { $exists: true } }).count();
+// = 25359
 
-// find all restaurants in brooklyn
-db.restaurants.find({
-  borough_id: db.borough.findOne({ name: "Brooklyn" })._id,
-});
+// let's check if all restaurants have a borough_id :
+console.log(
+  db.restaurants.find({ borough_id: { $exists: true } }).count() ===
+    db.restaurants.count()
+);
+// returns true
+
+// finds all restaurants in brooklyn
+db.restaurants.find(
+  {
+    borough_id: db.borough.findOne({ name: "Brooklyn" })._id,
+  },
+  { name: 1, borough_id: 1 }
+);
 ```
 
 ```js
@@ -268,8 +296,26 @@ for (cuisine of cuisines) {
 // find all restaurants with cuisine_id
 db.restaurants.find({ cuisine_id: { $exists: true } });
 
-// unset cuisine
+// with a count :
+db.restaurants.find({ cuisine_id: { $exists: true } }).count();
+// = 25359
+
+// let's check if all restaurants have a cuisine_id :
+console.log(
+  db.restaurants.find({ cuisine_id: { $exists: true } }).count() ===
+    db.restaurants.count()
+);
+
+// unset cuisine field
 db.restaurants.updateMany({}, { $unset: { cuisine: "" } });
+
+// find all restaurant french cuisine
+db.restaurants.find(
+  {
+    cuisine_id: db.cuisine.findOne({ name: "French" })._id,
+  },
+  { name: 1, cuisine_id: 1 }
+);
 ```
 
 # Exercice facultatif
