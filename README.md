@@ -326,19 +326,49 @@ async function totalGRadeAD(db) {
   const restaurants = await db.collection("restaurants");
 
   // aggregation pipeline
-  const res = await restaurants.aggregate([
-    // trie sur brooklyn
-    { $match: { borough: "Brooklyn" } },
-    { $unwind: "$grades" },
-    {
-      $group: {
-        _id: { name: "$name" },
-        countA: { $sum: { $cond: [{ $eq: ["$grades.grade", "A"] }, 1, 0] } }, // somme des A
-        countD: { $sum: { $cond: [{ $eq: ["$grades.grade", "D"] }, 1, 0] } }, // somme des D
+  const res = await restaurants
+    .aggregate([
+      { $match: { borough_id: "Brooklyn" } },
+      { $unwind: "$grades" },
+      {
+        $group: {
+          _id: { name: "$name" },
+          countA: { $sum: { $cond: [{ $eq: ["$grades.grade", "A"] }, 1, 0] } }, // somme des A
+          countD: { $sum: { $cond: [{ $eq: ["$grades.grade", "D"] }, 1, 0] } }, // somme des D
+        },
       },
-    },
-  ]);
+      {
+        $project: {
+          _id: 0,
+          name: "$_id.name",
+          countA: 1,
+          countD: 1,
+        },
+      },
+    ])
+    .toArray();
 
-  return res; // retourne le total des documents
+  return res; // retourne tous les documents dans brooklyn avec le nombre de A et D
 }
+
+// mongo only :
+db.restaurants.aggregate([
+  { $match: { borough_id: "Brooklyn" } },
+  { $unwind: "$grades" },
+  {
+    $group: {
+      _id: { name: "$name" },
+      countA: { $sum: { $cond: [{ $eq: ["$grades.grade", "A"] }, 1, 0] } }, // somme des A
+      countD: { $sum: { $cond: [{ $eq: ["$grades.grade", "D"] }, 1, 0] } }, // somme des D
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      name: "$_id.name",
+      countA: 1,
+      countD: 1,
+    },
+  },
+]);
 ```
